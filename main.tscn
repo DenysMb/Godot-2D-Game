@@ -1,0 +1,66 @@
+[gd_scene load_steps=8 format=3 uid="uid://be8115xcy8ibo"]
+
+[ext_resource type="Script" path="res://main.gd" id="1_jmsmj"]
+[ext_resource type="PackedScene" uid="uid://bm7iagqx82tk6" path="res://mob.tscn" id="2_66vc3"]
+[ext_resource type="PackedScene" uid="uid://baia1gxkgnfqr" path="res://player.tscn" id="2_fu1tj"]
+[ext_resource type="PackedScene" uid="uid://ctakcxnhho176" path="res://hud.tscn" id="4_5rsap"]
+[ext_resource type="AudioStream" uid="uid://be24xchxxjwx4" path="res://art/House In a Forest Loop.ogg" id="5_ioemc"]
+[ext_resource type="AudioStream" uid="uid://f6q2igr43ycn" path="res://art/gameover.wav" id="6_crgny"]
+
+[sub_resource type="Curve2D" id="Curve2D_p2c1v"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 472, 8, 0, 0, 0, 0, 480, 720, 0, 0, 0, 0, 0, 720, 0, 0, 0, 0, 0, 8)
+}
+point_count = 5
+
+[node name="Main" type="Node"]
+script = ExtResource("1_jmsmj")
+mob_scene = ExtResource("2_66vc3")
+
+[node name="Background" type="ColorRect" parent="."]
+modulate = Color(1, 1, 1, 0.196078)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(3.80233e-06, 0.529473, 0.313874, 1)
+
+[node name="Player" parent="." instance=ExtResource("2_fu1tj")]
+
+[node name="MobTimer" type="Timer" parent="."]
+wait_time = 0.5
+
+[node name="ScoreTimer" type="Timer" parent="."]
+
+[node name="StartTimer" type="Timer" parent="."]
+wait_time = 2.0
+one_shot = true
+
+[node name="BackgroundColorTimer" type="Timer" parent="."]
+wait_time = 5.0
+autostart = true
+
+[node name="StartPosition" type="Marker2D" parent="."]
+position = Vector2(240, 450)
+
+[node name="MobPath" type="Path2D" parent="."]
+curve = SubResource("Curve2D_p2c1v")
+
+[node name="MobSpawnLocation" type="PathFollow2D" parent="MobPath"]
+position = Vector2(0, 8)
+
+[node name="HUD" parent="." instance=ExtResource("4_5rsap")]
+
+[node name="Music" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("5_ioemc")
+
+[node name="DeathSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("6_crgny")
+
+[connection signal="hit" from="Player" to="." method="game_over"]
+[connection signal="timeout" from="MobTimer" to="." method="_on_mob_timer_timeout"]
+[connection signal="timeout" from="ScoreTimer" to="." method="_on_score_timer_timeout"]
+[connection signal="timeout" from="StartTimer" to="." method="_on_start_timer_timeout"]
+[connection signal="timeout" from="BackgroundColorTimer" to="." method="change_background_color"]
+[connection signal="start_game" from="HUD" to="." method="new_game"]
